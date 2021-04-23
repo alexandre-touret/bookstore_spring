@@ -1,0 +1,308 @@
+## TechForum-2021 Demo
+
+This projects illustrates how to use Quarkus on a simple use case.
+
+It is based on 2 (micro)services:
+
+* **Books**: an ebook store running on port 8082
+* **Numbers**: a backend service called by Books generating ISBN numbers. Runs on port 8081.
+
+It is inspired from Antonio Goncalvez fascicule project.
+
+During the demo, we will use Numbers "as is". The focus will be put on Books.
+
+## Requirements
+
+This demo has been developed with the following piece of software:
+
+* OpenJDK 11.0.10
+* Quarkus 1.13.2.Final
+* Docker 20.10.5
+* Docker-compoose 1.28.5
+* curl 7.64.1
+* jq 1.6 (possible alternative: python -m json.tool)
+
+
+## Preparing the demo
+This preparation should be done before running the live demo.
+
+### Package Books
+----
+cd rest-book
+mvn clean package
+----
+
+### Package Numbers
+----
+cd rest-number
+mvn clean package
+----
+
+### Start the infrastracture
+The infrastructure is made of:
+
+* PostgreSQL as database
+* Promotheus as backend for metrics
+* Jaeger as backend for OpenTracing.
+
+To start it:
+----
+cd infrastructure
+docker-compose up -d
+----
+
+It may take a few minutes if the images have not been yet downloaded.
+
+To check the infrastructure:
+----
+docker ps
+----
+You should see the 3 containers running.
+
+To stop it:
+----
+cd infrastructure
+docker-compose down
+----
+
+### Start Numbers
+----
+cd rest-numbers
+java -jar target/quarkus-app/quarkus-run.jar
+----
+
+### Start Books
+----
+cd rest-books
+java -jar target/quarkus-app/quarkus-run.jar
+----
+
+## Demo 1: Healt Check
+All script (*.sh) mentionned below are in the bin directory.
+
+Tribute to Josh Long: see how beautiful the banner is!
+
+Since we're running a packaged JAR file, the code is in "prod" mode. Quarkus distinguishes 3 modes with different default configurations and  behaviour: dev, test and prod.
+
+Check that Books is ready:
+----
+curl -s http://localhost:8082/q/health/ready | jq
+----
+We can see 2 live probes:
+
+* one relative to the database connection automatically provided by Quarkus
+* an other one related to an application specific maintenance flag.
+
+By default the maintenance flag is set to false. That means that the service is ready.
+
+There is an endpoint enabling to read and set that flag.
+
+Let's put the service in maintenance (setMaintenance.sh):
+----
+curl -X 'PUT' \
+  'http://localhost:8082/api/maintenance' \
+  -w "\n" \
+  -H 'Content-Type: text/plain' \
+  -d 'true' -v
+----
+We get an HTTP 204 answer (no-content).
+
+We can check now that Books is no longer ready (checkMaintenance.sh):
+----
+curl -s http://localhost:8082/q/health/ready | jq
+----
+Let's inspect the code of _MaintenanceController.checkInMaintenance_ to see how the HealthCheck probe is developped.
+
+Let's try to read a random book (randomBook.sh):
+[source,curl]
+----
+curl -s \
+  -w "\n" \
+  'localhost:8082/api/books/random' | jq
+----
+We get an answer from Books:
+[source,json]
+----
+{
+  "reason": "Service currently in maintenance"
+}
+----
+Let's browse the code of _CheckMaintenanceFilter.java_ and see how this answer is provided using a JAX-RS filter.
+
+Let's reopen the service (unsetMaintenance.sh):
+[source,]
+----
+curl -X 'PUT' \
+  'http://localhost:8082/api/maintenance' \
+  -w "\n" \
+  -H 'Content-Type: text/plain' \
+  -d 'false' -v
+----
+
+We can now check now that Books is ready again (checkMaintenance.sh):
+----
+curl -s http://localhost:8082/q/health/ready | jq
+----
+
+## Demo 2: inside the code
+
+Let's read a random book (randomBook.sh):
+[source,]
+----
+curl -s -w "\n" 'localhost:8082/api/books/random' | jq
+----
+Browse the following source to see how its is implemented:
+
+* _BookResource.java_: JAX-RS, OpenAPI, CDI,
+* __BookService.java__: HibernatePanache, CDI, OpenTracing
+
+## Demo 3: Focus on OpenAPI and Swagger UI
+
+Let's see the OpenAPI documentation (openapi.sh):
+[source,]
+----
+curl -s -w "\n" localhost:8082/q/openapi?format=json | jq | more
+----
+Browse the following files to see how OpenAPI is coded:
+
+* __RestApplication.java__: JAX-RS, OpenAPI
+* _BookResource.java_: JAX-RS, OpenAPI, CDI
+
+The code is running in "prod" mode, where SwaggerUI is disabled by default. For the sake of the demo, we have enabled it in the configuration:
+[source,properties]
+----
+# Enable Swagger UI for the demo
+quarkus.swagger-ui.always-include=true
+----
+
+Some configuration parameters can be overriden at runtime. For instance:
+----
+java -Dquarkus.http.port=9080 -jar target/quarkus-app/quarkus-run.jar
+----
+
+However not all parameters can be overiden in such way. In particular, Swagger UI cannot be enabled/disabled at runtime.
+
+Use your favorite browser and go to:
+----
+http://localhost:8082/q/swagger-ui/
+----
+
+Have a quick test with GET API Books (list all books).
+
+
+## Demo 4: Calling Numbers with RestClient
+
+Numbers is called by Books on book creation (createBook.sh):
+----
+curl -s -w "\n" -X POST -d '{"title":"Practising Quarkus", "author":"Antonio Goncalves", "yearOfPublication":"2020"}' -H "Content-Type: application/json" localhost:8082/api/books -v
+----
+
+We've got a 202 status code (Created) and a link to the created resource provided with the _Location_ header parameter.
+
+Let's read it:
+----
+curl -s -w "\n" localhost:8082/api/books/1 | jq
+----
+
+How does it work behind the scene? We make use of MicroProfile RestClient.
+
+Browse _BookService.java_, _NumberClient.java_ and _application.properties_ to see how RestClient is coded:
+
+* NumberClient: a strongly typed Java interface that represents Numbers annotated by @RegisterRestClient
+* application.properties: a bit of configuration to define the target URL
+* BookingService: the interface is CDI injected with @RestClient and can be used without any further JAX-RS coding.
+
+
+## Demo 5: Fault Tolerance
+So far, so good. But what if, Numbers is out of order? Let's kill it ... and try to create a book again.
+
+Now we've got a 202 (Accepted) status code: the request has been accepted but the book has not been created, because no ISBN numbers have been provided.
+
+What does it mean? In fact, we've entered a fallback mode: the book data have been stored in a file for later processing:
+----
+ls -l rest-book/target/book-*
+----
+
+Browse _BookService.java_ and _BookResource.java_ to see how FaultTolerance is coded:
+
+* _@Fallback_ annotation on _BookService.registerBook_
+* catch _IllegalException_ on _BookResource.createBook_
+
+Other features from FaulTolerance (not in the demo): Timeout, CircuitBreaker, Retry, BulkHead, Asynchronous. 
+
+## Demo 6: OpenTracing & Jaeger
+
+Let's switch to an important topic: observability and more specifically tracing.
+
+Connect to the Jaeger GUI from your browser:
+----
+http://localhost:16686/
+----
+
+Jaeger is a distributed tracing system developped by Uber and donated to CNCF. It can be used for:
+
+* Distributed context propagation
+* Distributed transaction monitoring
+* Root cause analysis
+* Service dependency analysis
+* Performance / latency optimization
+
+Let's create a book again (createBook.sh):
+----
+curl -s -w "\n" -X POST -d '{"title":"Practising Quarkus", "author":"Antonio Goncalves", "yearOfPublication":"2020"}' -H "Content-Type: application/json" localhost:8082/api/books -v
+----
+
+Let's search traces for Books. We can see how long has been spent in Books and Numbers.
+
+By default, all REST endpoints are traced. No code is needed. You just have to add the Quarkus extension, to configure it and to run a backend system such as Jaeger (or Zipkin). It is also possible to annotate methods or classes with __@Traced__. Browse _BookService.java_.
+
+Traces can also been enabled on JDBC at the risk of extreme verbosity.
+
+OpenTracing must be configured in __application.properties__: it is possible to trace all or only parts of the requests.
+
+Under the cover, context propagation is based on a specific HTTP header __uber-trace-id__.
+
+## Demo 7: Metrics & Promotheus
+
+Metrics is another aspect of observability.
+
+By default, Quarkus provides some base and vendor metrics.
+
+Base metrics are about the JVM (classes, threads, gc):
+----
+curl -s http://localhost:8082/q/metrics/base | more
+----
+
+Vendor metrics provides complementary technical metrics (cpu load, memory):
+----
+curl -s http://localhost:8082/q/metrics/vendor | more
+----
+
+It is also possible to add custom application metrics:
+----
+curl -s http://localhost:8082/q/metrics/application | more
+----
+
+In contrast to OpenTracing, there is no default application metric. Methods have to be explicitelly annotated to generate metrics.
+
+Curling metrics is limited to the current values, we have no historic. Let's use Prometheus to collect metrics in a smart way. Prometheus is a metrics-based monitoring and alerting system, initially developed at SoundCloud and now hosted by the CNCF. It is internally based on Time Series Database.
+
+Connect to the Prometheus GUI from your browser:
+----
+http://localhost:9090/graph
+----
+
+We can select a metric and do a graph with it. We can see different kinds of metrics:
+
+* counters: how much?
+* timers: how long?
+
+Prometheus offers a basic GUI and it is recommended to use Graphana in production.
+
+Browse _BookResource.java_ to see how Metrics is coded.
+
+## Demo 9: Testing
+
+Browse _BookResourceTest.java_ to see how to test using TestContainer.
+
+

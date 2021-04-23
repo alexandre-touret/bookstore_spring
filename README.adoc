@@ -82,7 +82,7 @@ All script (*.sh) mentionned below are in the bin directory.
 
 Tribute to Josh Long: see how beautiful the banner is!
 
-Since we're running a packaged JAR file, the code is in "prod" mode. Quarkus distinguishes 3 modes with different default configurations and  behaviour: dev, test and prod.
+Since we're running a packaged JAR file, the code is in "prod" mode.
 
 Check that Books is ready:
 ----

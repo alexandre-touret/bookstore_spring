@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  build-book:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -12,4 +12,4 @@ jobs:
         with:
           java-version: 11
       - name: Build with Gradle
-        run: ./gradlew build
+        run: cd rest-book && ./gradlew build

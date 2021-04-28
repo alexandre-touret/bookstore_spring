@@ -29,7 +29,7 @@ This preparation should be done before running the live demo.
 ### Package Books
 ----
 cd rest-book
-gradle build
+gradle build bootImage
 ----
 
 ### Package Numbers

@@ -1,22 +1,20 @@
 package org.techforum.spring.book.service;
 
-import org.assertj.core.api.Assertions;
-import org.techforum.spring.book.entity.Book;
-import org.techforum.spring.book.repository.BookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.techforum.spring.book.entity.Book;
+import org.techforum.spring.book.repository.BookRepository;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -35,7 +33,11 @@ class BookServiceTest {
 
     @Test
     void should_find_a_random_book() {
-        when(bookRepository.findAll()).thenReturn(createBookList());
+        var longList = createBookList().stream().map(Book::getId).collect(Collectors.toList());
+        when(bookRepository.findAllIds()).thenReturn(longList);
+        Book book = new Book();
+        book.setId(1L);
+        when(bookRepository.findById(any(Long.class))).thenReturn(Optional.of(book));
         assertNotNull(bookService.findRandomBook());
     }
 

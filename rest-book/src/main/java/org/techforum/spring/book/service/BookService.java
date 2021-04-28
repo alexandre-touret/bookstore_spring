@@ -2,18 +2,17 @@ package org.techforum.spring.book.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 import org.techforum.spring.book.entity.Book;
 import org.techforum.spring.book.repository.BookRepository;
-import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Random;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -28,7 +27,10 @@ public class BookService {
     }
 
     public Book findRandomBook() {
-        return StreamSupport.stream(bookRepository.findAll().spliterator(), false).findAny().get();
+        List<Long> ids = bookRepository.findAllIds();
+        final var size = ids.size();
+        var aLong = ids.get(new Random().nextInt(size));
+        return findBookById(aLong).get();
     }
 
     public Book registerBook(@Valid Book book) {

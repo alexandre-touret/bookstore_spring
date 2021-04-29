@@ -21,6 +21,7 @@ This demo has been developed with the following piece of software:
 * Docker-compoose 1.28.5
 * curl 7.64.1
 * jq 1.6 (possible alternative: python -m json.tool)
+* Gradle 7.0
 
 
 ## Preparing the demo
@@ -28,14 +29,12 @@ This preparation should be done before running the live demo.
 
 ### Package Books
 ----
-cd rest-book
-gradle build bootImage
+gradle build -p rest-book
 ----
 
 ### Package Numbers
 ----
-cd rest-number
-gradle build
+gradle build -p rest-numbers
 ----
 
 ### Start the infrastracture
@@ -73,8 +72,8 @@ java -jar build/libs/rest-numbers-0.0.1-SNAPSHOT.jar
 
 ### Start Books
 ----
-cd rest-books
-java -jar build/libs/rest-bookstore-0.0.1-SNAPSHOT.jar
+cd rest-book
+java -jar build/libs/rest-book-0.0.1-SNAPSHOT.jar
 ----
 
 ## Demo 1: Health Check
@@ -179,7 +178,7 @@ springdoc.api-docs.enabled=false
 
 Some configuration parameters can be overriden at runtime. For instance:
 ----
-java -Dserver.port=9080 -Dspringdoc.api-docs.enabled=false -jar build/libs/rest-bookstore-0.0.1-SNAPSHOT.jar
+java -Dserver.port=9080 -Dspringdoc.api-docs.enabled=false -jar build/libs/rest-book-0.0.1-SNAPSHOT.jar
 ----
 
 However not all parameters can be overiden in such way. In particular, Swagger UI cannot be enabled/disabled at runtime.

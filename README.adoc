@@ -162,7 +162,7 @@ Browse the following source to see how its is implemented:
 Let's see the OpenAPI documentation (openapi.sh):
 [source,]
 ----
-curl -s -w "\n" localhost:8082/v3/api-docs?format=json | jq | more
+curl -s -w "\n" localhost:8082/v3/api-docs?format=json | jq 
 ----
 Browse the following files to see how OpenAPI is coded:
 

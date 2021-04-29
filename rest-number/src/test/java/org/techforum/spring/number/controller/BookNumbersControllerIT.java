@@ -33,6 +33,5 @@ class BookNumbersControllerIT {
         assertNotNull(body.getEan13());
         assertNotNull(body.getIsbn10());
         assertNotNull(body.getIsbn13());
-
     }
 }

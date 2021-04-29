@@ -14,4 +14,9 @@ public class GlobalExceptionHandler {
     public void maintenance() {
         /* nothing to do */
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler({RuntimeException.class, Exception.class})
+    public void anyException() {
+    }
 }

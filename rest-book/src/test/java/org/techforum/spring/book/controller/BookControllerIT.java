@@ -1,20 +1,15 @@
 package org.techforum.spring.book.controller;
 
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.techforum.spring.book.entity.Book;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
+import org.techforum.spring.book.entity.Book;
 
 import java.net.URI;
 import java.util.List;
@@ -81,10 +76,10 @@ class BookControllerIT {
         book.setAuthor("George Orwell");
         book.setTitle("Animal's farm");
         var responseEntity = restTemplate.postForEntity("http://127.0.0.1:" + port + "/api/books", book, Book.class);
-        assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
-        var book1 = responseEntity.getBody();
-        assertNotNull(book1);
-        assertTrue(book1.getId() >= 1L);
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        var uri = responseEntity.getHeaders().getLocation();
+        assertNotNull(uri);
+        assertTrue(uri.getPath().matches(".*/api/books/[1-9]+$"));
     }
 
     @Test

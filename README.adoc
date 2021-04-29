@@ -153,7 +153,7 @@ curl -s -w "\n" 'localhost:8082/api/books/random' | jq
 ----
 Browse the following source to see how its is implemented:
 
-* _link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]_: Spring MVC
+* _link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]_: Spring MVC, SpringDoc, Swagger
 * _link:rest-book/src/main/java/org/techforum/spring/book/service/BookService.java[BookService.java]_: Spring, Spring Data, OpenTracing
 * _link:rest-book/src/main/java/org/techforum/spring/book/repository/BookRepository.java[BookRepository.java]_: Spring Data
 
@@ -162,34 +162,34 @@ Browse the following source to see how its is implemented:
 Let's see the OpenAPI documentation (openapi.sh):
 [source,]
 ----
-curl -s -w "\n" localhost:8082/q/openapi?format=json | jq | more
+curl -s -w "\n" localhost:8082/v3/api-docs?format=json | jq | more
 ----
 Browse the following files to see how OpenAPI is coded:
 
-* __RestApplication.java__: JAX-RS, OpenAPI
-* _BookResource.java_: JAX-RS, OpenAPI, CDI
+* _link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]_
+* _link:rest-book/src/main/java/org/techforum/spring/GlobalExceptionHandler.java[GlobalExceptionHandler.java]_
 
-The code is running in "prod" mode, where SwaggerUI is disabled by default. For the sake of the demo, we have enabled it in the configuration:
-[source,properties]
+OpenAPI/Swagger is enabled by default.
+You can disable it by applying this property
+
 ----
-# Enable Swagger UI for the demo
-quarkus.swagger-ui.always-include=true
+# Disable Swagger UI for the demo
+springdoc.api-docs.enabled=false
 ----
 
 Some configuration parameters can be overriden at runtime. For instance:
 ----
-java -Dquarkus.http.port=9080 -jar target/quarkus-app/quarkus-run.jar
+java -Dserver.port=9080 -Dspringdoc.api-docs.enabled=false -jar build/libs/rest-bookstore-0.0.1-SNAPSHOT.jar
 ----
 
 However not all parameters can be overiden in such way. In particular, Swagger UI cannot be enabled/disabled at runtime.
 
 Use your favorite browser and go to:
 ----
-http://localhost:8082/q/swagger-ui/
+http://localhost:9080/swagger-ui.html
 ----
 
 Have a quick test with GET API Books (list all books).
-
 
 ## Demo 4: Calling Numbers with RestClient
 

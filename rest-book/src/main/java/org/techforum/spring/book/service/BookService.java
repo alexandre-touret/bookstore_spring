@@ -17,6 +17,9 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Book Spring Service
+ */
 @Service
 public class BookService {
 

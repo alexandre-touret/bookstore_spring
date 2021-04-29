@@ -77,7 +77,7 @@ cd rest-books
 java -jar build/libs/rest-bookstore-0.0.1-SNAPSHOT.jar
 ----
 
-## Demo 1: Healt Check
+## Demo 1: Health Check
 All script (*.sh) mentionned below are in the bin directory.
 
 Tribute to Josh Long: see how beautiful the banner is!
@@ -153,8 +153,9 @@ curl -s -w "\n" 'localhost:8082/api/books/random' | jq
 ----
 Browse the following source to see how its is implemented:
 
-* _BookResource.java_: JAX-RS, OpenAPI, CDI,
-* __BookService.java__: HibernatePanache, CDI, OpenTracing
+* _link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]_: Spring MVC
+* _link:rest-book/src/main/java/org/techforum/spring/book/service/BookService.java[BookService.java]_: Spring, Spring Data, OpenTracing
+* _link:rest-book/src/main/java/org/techforum/spring/book/repository/BookRepository.java[BookRepository.java]_: Spring Data
 
 ## Demo 3: Focus on OpenAPI and Swagger UI
 

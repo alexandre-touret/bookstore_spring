@@ -12,6 +12,9 @@ import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * Book REST API
+ */
 @RestController()
 @RequestMapping(value = "/api/books", produces = APPLICATION_JSON_VALUE)
 public class BookController {
@@ -31,6 +34,11 @@ public class BookController {
         return ResponseEntity.ok(bookService.findAllBooks());
     }
 
+    /**
+     * Returns the number of books
+     *
+     * @return A Map which will be automatically transformed into a JSON Object
+     */
     @GetMapping("/count")
     public ResponseEntity<Map<String, Long>> count() {
         return ResponseEntity.ok(Map.of("books.count", bookService.count()));

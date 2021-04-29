@@ -6,6 +6,9 @@ import org.techforum.spring.book.entity.Book;
 
 import java.util.List;
 
+/**
+ * Book Spring Data Repository
+ */
 public interface BookRepository extends CrudRepository<Book, Long> {
 
     @Query(value = "select b.id from Book b")

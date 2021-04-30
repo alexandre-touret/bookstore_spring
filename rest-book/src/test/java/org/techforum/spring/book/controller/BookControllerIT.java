@@ -50,7 +50,8 @@ class BookControllerIT {
 
     @BeforeEach
     void setUp() {
-
+        mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockServer.reset();
     }
 
     /**
@@ -60,7 +61,6 @@ class BookControllerIT {
      * @throws JsonProcessingException
      */
     private void createMockServerStandard() throws URISyntaxException, JsonProcessingException {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
         IsbnNumbers isbnNumbers = new IsbnNumbers();
         isbnNumbers.setIsbn10("0123456789");
         isbnNumbers.setIsbn13("0123456789012");
@@ -80,7 +80,6 @@ class BookControllerIT {
      * @throws JsonProcessingException
      */
     private void createMockServerTimeout() throws URISyntaxException, JsonProcessingException {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
         IsbnNumbers isbnNumbers = new IsbnNumbers();
         isbnNumbers.setIsbn10("0123456789");
         isbnNumbers.setIsbn13("0123456789012");

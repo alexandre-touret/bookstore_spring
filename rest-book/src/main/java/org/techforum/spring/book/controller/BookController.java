@@ -81,6 +81,8 @@ public class BookController {
     @Operation(summary = "Creates a book")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "The book has not been yet created but will be ASAP"),
+            @ApiResponse(responseCode = "408", description = "The number api is unreachable"),
+            @ApiResponse(responseCode = "500", description = "An unexpected error has occured"),
             @ApiResponse(responseCode = "201", description = "Book created. The URI is filled in the Location header",
                     headers = {@Header(name = "location", schema = @Schema(implementation = URI.class), description = "The generated book's URI")})})
     @PostMapping(consumes = APPLICATION_JSON_VALUE)

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.techforum.spring.book.dto.IsbnNumbers;
 import org.techforum.spring.book.entity.Book;
+import org.techforum.spring.book.exception.ApiCallTimeoutException;
 import org.techforum.spring.book.repository.BookRepository;
 
 import javax.validation.Valid;
@@ -53,9 +54,17 @@ public class BookService {
         List<Long> ids = bookRepository.findAllIds();
         final var size = ids.size();
         var aLong = ids.get(new Random().nextInt(size));
-        return findBookById(aLong).get();
+        return findBookById(aLong).orElseThrow(() -> new IllegalStateException());
     }
 
+
+    /**
+     * Registers the book. If the underlying API is not reachable, a circuit breaker is applied to call <code>fallbackPersistBook</code>
+     *
+     * @param book book to register
+     * @return the book saved
+     * @see #fallbackPersistBook(Book)
+     */
     public Book registerBook(@Valid Book book) {
         circuitBreakerFactory.create("slowNumbers").run(
                 () -> persistBook(book),
@@ -72,9 +81,10 @@ public class BookService {
             var bookJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(book);
             out.println(bookJson);
         } catch (FileNotFoundException | JsonProcessingException e) {
+            LOGGER.error(e.getMessage(), e);
             throw new IllegalStateException("Cannot serialize data");
         }
-        throw new IllegalStateException("Numbers not accessible");
+        throw new ApiCallTimeoutException("Numbers not accessible");
     }
 
     public List<Book> findAllBooks() {

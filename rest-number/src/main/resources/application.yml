@@ -1,10 +1,6 @@
 server:
   port: 8081
 
-spring:
-  cloud:
-    config:
-      enabled: false
 
 resilience4j.bulkhead:
   configs:

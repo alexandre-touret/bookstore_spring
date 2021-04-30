@@ -221,13 +221,14 @@ Now we've got a 202 (Accepted) status code: the request has been accepted but th
 
 What does it mean? In fact, we've entered a fallback mode: the book data have been stored in a file for later processing:
 ----
-ls -l rest-book/target/book-*
+ls -l rest-book/book-*
 ----
 
 Browse _BookService.java_, _BookConfiguration_ and _BookController.java_ to see how FaultTolerance is coded:
 
-* _@Fallback_ annotation on _BookService.registerBook_
-* catch _IllegalException_ on _BookResource.createBook_
+* _CircuitBreakerFactory_ usage on _BookService.registerBook_
+* _Resilience4JCircuitBreakerFactory_ (global and specific) configuration on _BookConfiguration_
+* Catch _ApiCallTimeoutException_ on _GlobalExceptionHandler_
 
 Other features from FaulTolerance (not in the demo): Timeout, CircuitBreaker, Retry, BulkHead, Asynchronous. 
 

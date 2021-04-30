@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.client.ExpectedCount;
@@ -34,10 +35,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @Sql("classpath:/books-data.sql")
 class BookControllerIT {
 
+    public static final String API_BOOKS = "http://127.0.0.1:8081/api/books";
     @LocalServerPort
     private int port;
-
-    private IsbnNumbers isbnNumbers;
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -51,18 +51,51 @@ class BookControllerIT {
     private ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp() throws URISyntaxException, JsonProcessingException {
+    void setUp() {
+
+    }
+
+    /**
+     * Gets a mock server for book numbers api
+     *
+     * @throws URISyntaxException
+     * @throws JsonProcessingException
+     */
+    private void createMockServerStandard() throws URISyntaxException, JsonProcessingException {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         IsbnNumbers isbnNumbers = new IsbnNumbers();
         isbnNumbers.setIsbn10("0123456789");
         isbnNumbers.setIsbn13("0123456789012");
         mockServer.expect(ExpectedCount.once(),
-                requestTo(new URI("http://127.0.0.1:8081/api/books")))
+                requestTo(new URI(API_BOOKS)))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(mapper.writeValueAsString(isbnNumbers))
                 );
+    }
+
+    /**
+     * Creates a mockserver which hangs
+     *
+     * @throws URISyntaxException
+     * @throws JsonProcessingException
+     */
+    private void createMockServerTimeout() throws URISyntaxException, JsonProcessingException {
+        mockServer = MockRestServiceServer.createServer(restTemplate);
+        IsbnNumbers isbnNumbers = new IsbnNumbers();
+        isbnNumbers.setIsbn10("0123456789");
+        isbnNumbers.setIsbn13("0123456789012");
+        mockServer.expect(ExpectedCount.once(),
+                requestTo(new URI(API_BOOKS)))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(request -> {
+                    try {
+                        Thread.sleep(30000);
+                    } catch (InterruptedException e) {
+                    }
+                    return new MockClientHttpResponse(isbnNumbers.toString().getBytes(), HttpStatus.OK);
+                });
     }
 
     @Test
@@ -108,7 +141,8 @@ class BookControllerIT {
     }
 
     @Test
-    void should_register_a_book() throws Exception {
+    void should_register_a_book_successfully() throws Exception {
+        createMockServerStandard();
         Book book = new Book();
         book.setAuthor("George Orwell");
         book.setTitle("Animal's farm");
@@ -117,6 +151,16 @@ class BookControllerIT {
         var uri = responseEntity.getHeaders().getLocation();
         assertNotNull(uri);
         assertTrue(uri.getPath().matches(".*/api/books/[1-9]+$"));
+    }
+
+    @Test
+    void should_register_a_book_timeout() throws Exception {
+        createMockServerTimeout();
+        Book book = new Book();
+        book.setAuthor("George Orwell");
+        book.setTitle("Animal's farm");
+        var responseEntity = testRestTemplate.postForEntity("http://127.0.0.1:" + port + "/api/books", book, Book.class);
+        assertEquals(HttpStatus.REQUEST_TIMEOUT, responseEntity.getStatusCode());
     }
 
     @Test

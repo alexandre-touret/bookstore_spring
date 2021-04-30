@@ -1,3 +1,6 @@
+server:
+  port: 8082
+
 spring:
   ## The most important feature... ever
   banner:
@@ -16,8 +19,7 @@ spring:
       resilience4j:
         enabled: true
 
-  server:
-    port: 8082
+
 
 management:
   endpoint:
@@ -45,3 +47,4 @@ booknumbers:
   api:
     url: http://127.0.0.1:8081/api/books
     timeout_sec: 2
+

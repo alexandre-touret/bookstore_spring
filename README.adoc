@@ -204,13 +204,14 @@ Let's read it:
 curl -s -w "\n" localhost:8082/api/books/1 | jq
 ----
 
-How does it work behind the scene? We make use of MicroProfile RestClient.
+How does it work behind the scene?
+We make use of Spring RestTemplate
 
-Browse _BookService.java_, _NumberClient.java_ and _application.properties_ to see how RestClient is coded:
+Browse _BookService.java_ , _BookConfiguration_ and _application.yml_ to see how it is coded:
 
-* NumberClient: a strongly typed Java interface that represents Numbers annotated by @RegisterRestClient
-* application.properties: a bit of configuration to define the target URL
-* BookingService: the interface is CDI injected with @RestClient and can be used without any further JAX-RS coding.
+* application.yml: a bit of configuration to define the target URL
+* BookingService: the rest template is injected in the constructor
+* BookingConfiguration: creates the restTemplate instance
 
 
 ## Demo 5: Fault Tolerance
@@ -223,7 +224,7 @@ What does it mean? In fact, we've entered a fallback mode: the book data have be
 ls -l rest-book/target/book-*
 ----
 
-Browse _BookService.java_ and _BookResource.java_ to see how FaultTolerance is coded:
+Browse _BookService.java_, _BookConfiguration_ and _BookController.java_ to see how FaultTolerance is coded:
 
 * _@Fallback_ annotation on _BookService.registerBook_
 * catch _IllegalException_ on _BookResource.createBook_

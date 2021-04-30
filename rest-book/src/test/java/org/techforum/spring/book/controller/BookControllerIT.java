@@ -11,7 +11,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.mock.http.client.MockClientHttpResponse;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -31,7 +30,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 @Sql("classpath:/books-data.sql")
 class BookControllerIT {
 

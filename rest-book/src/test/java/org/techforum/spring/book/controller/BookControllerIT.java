@@ -50,7 +50,7 @@ class BookControllerIT {
 
     @BeforeEach
     void setUp() {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockServer = MockRestServiceServer.bindTo(restTemplate).build();
         mockServer.reset();
     }
 
@@ -151,7 +151,7 @@ class BookControllerIT {
     }
 
     @Test
-    void should_register_a_book_timeout() throws Exception {
+    void should_throw_a_timeout_while_registering() throws Exception {
         createMockServerTimeout();
         Book book = new Book();
         book.setAuthor("George Orwell");

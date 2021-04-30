@@ -2,7 +2,10 @@ package org.techforum.spring.book.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.techforum.spring.book.dto.IsbnNumbers;
 import org.techforum.spring.book.entity.Book;
 import org.techforum.spring.book.repository.BookRepository;
 
@@ -24,9 +27,15 @@ import static java.util.stream.Collectors.toList;
 public class BookService {
 
     private BookRepository bookRepository;
+    private RestTemplate restTemplate;
 
-    public BookService(BookRepository bookRepository) {
+
+    private String isbnServiceURL;
+
+    public BookService(BookRepository bookRepository, RestTemplate restTemplate, @Value("${book.numbers.api.url}") String isbnServiceURL) {
         this.bookRepository = bookRepository;
+        this.restTemplate = restTemplate;
+        this.isbnServiceURL = isbnServiceURL;
     }
 
     public Book findRandomBook() {
@@ -37,11 +46,9 @@ public class BookService {
     }
 
     public Book registerBook(@Valid Book book) {
-        // TODO
-//        IsbnNumbers isbnNumbers = numberProxy.generateIsbnNumbers();
-//        book.isbn13 = isbnNumbers.getIsbn13();
-//        book.isbn10 = isbnNumbers.getIsbn10();
-//
+        final var isbnNumbers = restTemplate.getForEntity(isbnServiceURL, IsbnNumbers.class).getBody();
+        book.isbn13 = isbnNumbers.getIsbn13();
+        book.isbn10 = isbnNumbers.getIsbn10();
         return bookRepository.save(book);
     }
 

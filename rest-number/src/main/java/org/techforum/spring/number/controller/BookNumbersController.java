@@ -1,15 +1,16 @@
 package org.techforum.spring.number.controller;
 
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.techforum.spring.number.dto.BookNumbers;
 import org.techforum.spring.number.service.BookNumbersService;
 
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -25,9 +26,14 @@ public class BookNumbersController {
         this.bookNumbersService = bookNumbersService;
     }
 
+    @TimeLimiter(name = "book-numbers", fallbackMethod = "generateBookNumbersFallBack")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<BookNumbers> generateBookNumbers() throws ExecutionException, InterruptedException {
-        return ResponseEntity.ok(bookNumbersService.createBookNumbers().get());
+    public CompletableFuture<BookNumbers> generateBookNumbers() {
+        return CompletableFuture.supplyAsync(() -> bookNumbersService.createBookNumbers());
     }
 
+    public CompletableFuture<BookNumbers> generateBookNumbersFallBack(TimeoutException e) {
+        LOGGER.error(e.getMessage(), e);
+        return CompletableFuture.completedFuture(new BookNumbers());
+    }
 }

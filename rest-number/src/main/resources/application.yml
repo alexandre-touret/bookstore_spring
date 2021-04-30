@@ -32,7 +32,7 @@ resilience4j.timelimiter:
   instances:
     book-numbers:
       baseConfig: default
-time.to.sleep: 15000
+time.to.sleep: 1000
 
 
 management:

@@ -31,9 +31,9 @@ public class BookNumbersService {
         LOGGER.info("JJS => timeToSleep=" + timeToSleep);
     }
 
-    @Bulkhead(name = "book-numbers")
-    @TimeLimiter(name = "book-numbers")
-    public CompletableFuture<BookNumbers> createBookNumbers() {
+
+
+    public BookNumbers createBookNumbers() {
         LOGGER.info("Generating book numbers, sleeping " + timeToSleep + " msec");
 
         try {
@@ -51,6 +51,6 @@ public class BookNumbersService {
         bookNumbers.setEan8(faker.code().ean8());
         bookNumbers.setEan13(faker.code().ean13());
         bookNumbers.setGenerationDate(Instant.now());
-        return CompletableFuture.completedFuture(bookNumbers);
+        return bookNumbers;
     }
 }

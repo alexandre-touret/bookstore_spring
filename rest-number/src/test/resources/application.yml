@@ -27,12 +27,12 @@ resilience4j.thread-pool-bulkhead:
 resilience4j.timelimiter:
   configs:
     default:
-      cancelRunningFuture: false
+      cancelRunningFuture: true
       timeoutDuration: 2s
   instances:
     book-numbers:
       baseConfig: default
-time.to.sleep: 30000
+time.to.sleep: 100
 
 
 management:
@@ -51,3 +51,7 @@ management:
       enabled: true
     readinessstate:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'

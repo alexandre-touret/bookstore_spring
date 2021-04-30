@@ -3,9 +3,8 @@ package org.techforum.spring.number.controller;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import org.techforum.spring.number.dto.BookNumbers;
 import org.techforum.spring.number.service.BookNumbersService;
 
@@ -32,8 +31,10 @@ public class BookNumbersController {
         return CompletableFuture.supplyAsync(() -> bookNumbersService.createBookNumbers());
     }
 
+    @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
+    @ExceptionHandler({TimeoutException.class})
     public CompletableFuture<BookNumbers> generateBookNumbersFallBack(TimeoutException e) {
         LOGGER.error(e.getMessage(), e);
-        return CompletableFuture.completedFuture(new BookNumbers());
+        return CompletableFuture.failedFuture(e);
     }
 }

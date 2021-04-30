@@ -5,15 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.techforum.spring.number.dto.BookNumbers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class BookNumbersControllerIT {
+@ActiveProfiles(value = {"timeout", "default"})
+class BookNumbersControllerTimeoutIT {
 
     @LocalServerPort
     private int port;
@@ -22,14 +23,8 @@ class BookNumbersControllerIT {
     private TestRestTemplate restTemplate;
 
     @Test
-    void should_get_book_numbers() {
+    void should_get_book_numbers_fallback() {
         var response = restTemplate.getForEntity("http://127.0.0.1:" + port + "/api/books", BookNumbers.class);
-        assertEquals(OK, response.getStatusCode());
-        final var body = response.getBody();
-        assertNotNull(body.getAsin());
-        assertNotNull(body.getEan8());
-        assertNotNull(body.getEan13());
-        assertNotNull(body.getIsbn10());
-        assertNotNull(body.getIsbn13());
+        assertEquals(GATEWAY_TIMEOUT, response.getStatusCode());
     }
 }

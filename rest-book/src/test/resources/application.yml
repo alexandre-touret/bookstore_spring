@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test_db
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    show-sql: true
+    hibernate:
+      show_sql: true
+      format_sql: true
+      generate_statistics: true
+    circuitbreaker:
+      resilience4j:
+        enabled: true
+
+springdoc:
+  api-docs:
+    enabled: false
+
+
+booknumbers:
+  api:
+    url: http://127.0.0.1:8081/api/books
+    timeout_sec: 2

@@ -2,8 +2,15 @@ package org.techforum.spring.book.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.techforum.spring.book.dto.IsbnNumbers;
 import org.techforum.spring.book.entity.Book;
+import org.techforum.spring.book.exception.ApiCallTimeoutException;
 import org.techforum.spring.book.repository.BookRepository;
 
 import javax.validation.Valid;
@@ -23,37 +30,61 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class BookService {
 
-    private BookRepository bookRepository;
 
-    public BookService(BookRepository bookRepository) {
+    private final static Logger LOGGER = LoggerFactory.getLogger(BookService.class);
+    private BookRepository bookRepository;
+    private RestTemplate restTemplate;
+
+    private CircuitBreakerFactory circuitBreakerFactory;
+    private String isbnServiceURL;
+
+    public BookService(BookRepository bookRepository,
+                       RestTemplate restTemplate,
+                       @Value("${booknumbers.api.url}") String isbnServiceURL,
+                       @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") CircuitBreakerFactory circuitBreakerFactory) {
         this.bookRepository = bookRepository;
+        this.restTemplate = restTemplate;
+        this.isbnServiceURL = isbnServiceURL;
+
+        this.circuitBreakerFactory = circuitBreakerFactory;
+
     }
 
     public Book findRandomBook() {
         List<Long> ids = bookRepository.findAllIds();
         final var size = ids.size();
         var aLong = ids.get(new Random().nextInt(size));
-        return findBookById(aLong).get();
+        return findBookById(aLong).orElseThrow(() -> new IllegalStateException());
     }
 
+
+    /**
+     * Registers the book. If the underlying API is not reachable, a circuit breaker is applied to call <code>fallbackPersistBook</code>
+     *
+     * @param book book to register
+     * @return the book saved
+     * @see #fallbackPersistBook(Book)
+     */
     public Book registerBook(@Valid Book book) {
-        // TODO
-//        IsbnNumbers isbnNumbers = numberProxy.generateIsbnNumbers();
-//        book.isbn13 = isbnNumbers.getIsbn13();
-//        book.isbn10 = isbnNumbers.getIsbn10();
-//
+        circuitBreakerFactory.create("slowNumbers").run(
+                () -> persistBook(book),
+                throwable -> fallbackPersistBook(book)
+        );
+
         return bookRepository.save(book);
     }
 
     // We have no ISBN numbers, we cannot persist in the database
-    private Book fallbackPersistBook(Book book) throws FileNotFoundException, JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        var bookJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(book);
+    private Book fallbackPersistBook(Book book) {
         try (PrintWriter out = new PrintWriter("book-" + Instant.now().toEpochMilli() + ".json")) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            var bookJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(book);
             out.println(bookJson);
+        } catch (FileNotFoundException | JsonProcessingException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalStateException("Cannot serialize data");
         }
-
-        throw new IllegalStateException("Numbers not accessible");
+        throw new ApiCallTimeoutException("Numbers not accessible");
     }
 
     public List<Book> findAllBooks() {
@@ -77,5 +108,11 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
+    private Book persistBook(Book book) {
+        var isbnNumbers = restTemplate.getForEntity(isbnServiceURL, IsbnNumbers.class).getBody();
+        book.isbn13 = isbnNumbers.getIsbn13();
+        book.isbn10 = isbnNumbers.getIsbn10();
+        return bookRepository.save(book);
+    }
 
 }

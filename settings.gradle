@@ -1,0 +1,3 @@
+rootProject.name = 'Techforum Spring'
+include 'rest-book'
+include 'rest-number'

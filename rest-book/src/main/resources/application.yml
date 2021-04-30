@@ -1,0 +1,50 @@
+server:
+  port: 8082
+
+spring:
+  ## The most important feature... ever
+  banner:
+    location=classpath:/banner.txt
+  datasource:
+    url: jdbc:postgresql://localhost:5432/books_database
+    username: book
+    password: book
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    hibernate:
+      ddl-auto: create-drop
+
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
+
+
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      enabled: true
+      probes:
+        enabled: true
+    shutdown:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    datasource:
+      enabled: true
+springdoc:
+  api-docs:
+    enabled: true
+  writer-with-default-pretty-printer: true
+
+
+booknumbers:
+  api:
+    url: http://127.0.0.1:8081/api/books
+    timeout_sec: 2
+

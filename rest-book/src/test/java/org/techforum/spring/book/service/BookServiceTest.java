@@ -4,7 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
+import org.techforum.spring.book.dto.IsbnNumbers;
 import org.techforum.spring.book.entity.Book;
 import org.techforum.spring.book.repository.BookRepository;
 
@@ -16,8 +22,8 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 class BookServiceTest {
@@ -26,15 +32,25 @@ class BookServiceTest {
     private BookRepository bookRepository;
     private BookService bookService;
 
+    @MockBean
+    private RestTemplate restTemplate;
+
+    @MockBean
+    private CircuitBreakerFactory circuitBreakerFactory;
+
+
+    private ResponseEntity<IsbnNumbers> isbnNumbersResponseEntity;
+
     @BeforeEach
     void setUp() {
-        bookService = new BookService(bookRepository);
+        bookService = new BookService(bookRepository, restTemplate, "URL", circuitBreakerFactory);
     }
 
     @Test
     void should_find_a_random_book() {
         var longList = createBookList().stream().map(Book::getId).collect(Collectors.toList());
         when(bookRepository.findAllIds()).thenReturn(longList);
+
         Book book = new Book();
         book.setId(1L);
         when(bookRepository.findById(any(Long.class))).thenReturn(Optional.of(book));
@@ -43,12 +59,24 @@ class BookServiceTest {
 
     @Test
     void should_register_a_book() {
+        /* book & Isbn creation */
         var book = new Book();
         book.setId(1L);
         book.setAuthor("author");
         book.setDescription("description");
         book.setPrice(BigDecimal.TEN);
+
+        IsbnNumbers isbnNumbers = new IsbnNumbers();
+        isbnNumbers.setIsbn10("0123456789");
+        isbnNumbers.setIsbn13("0123456789012");
+        /* Mock configuration */
+        isbnNumbersResponseEntity = new ResponseEntity<>(isbnNumbers, HttpStatus.OK);
+        when(restTemplate.getForEntity(eq("URL"), eq(IsbnNumbers.class))).thenReturn(isbnNumbersResponseEntity);
+        final var circuitBreaker = mock(CircuitBreaker.class);
+        when(circuitBreaker.run(any(), any())).thenReturn(book);
+        when(circuitBreakerFactory.create(eq("slowNumbers"))).thenReturn(circuitBreaker);
         when(bookRepository.save(any(Book.class))).thenReturn(book);
+
         var registerBook = bookService.registerBook(book);
         assertNotNull(registerBook);
         assertEquals(book.getId(), registerBook.getId());

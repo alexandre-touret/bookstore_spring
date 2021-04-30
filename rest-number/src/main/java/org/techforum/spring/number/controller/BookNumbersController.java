@@ -1,6 +1,11 @@
 package org.techforum.spring.number.controller;
 
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,6 +32,14 @@ public class BookNumbersController {
 
     @TimeLimiter(name = "book-numbers", fallbackMethod = "generateBookNumbersFallBack")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Gets book numbers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found the book numbers",
+                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BookNumbers.class))}),
+            @ApiResponse(responseCode = "504", description = "Timeout error",
+                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BookNumbers.class))})})
     public CompletableFuture<BookNumbers> generateBookNumbers() {
         return CompletableFuture.supplyAsync(() -> bookNumbersService.createBookNumbers());
     }

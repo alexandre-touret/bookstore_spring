@@ -24,7 +24,12 @@ spring:
 management:
   endpoints:
     enabled-by-default: true
-
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
   endpoint:
     health:
       show-details: always

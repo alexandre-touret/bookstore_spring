@@ -32,6 +32,14 @@ time.to.sleep: 1000
 
 
 management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
   auditevents:
     enabled: true
   endpoint:

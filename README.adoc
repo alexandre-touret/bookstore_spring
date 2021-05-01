@@ -305,17 +305,23 @@ We can also gather rest endpoints metrics such as the time to respond.
 
 Base metrics are about the JVM (classes, threads, gc)
 ----
-curl -s http://localhost:8082/actuator/metrics/ | more
+curl -s http://localhost:8082/actuator/metrics/
+curl -s http://localhost:8082/actuator/metrics/http.server.requests
 ----
 
 Vendor metrics provides complementary technical metrics (cpu load, memory):
 ----
-curl -s http://localhost:8082/q/metrics/vendor | more
+curl -s http://localhost:8082/actuator/metrics/system.cpu.usage
+curl -s http://localhost:8082/actuator/metrics/jvm.memory.used
 ----
 
-It is also possible to add custom application metrics:
+It is also possible to add custom application metrics, such as a rest controller metrics.
+To start aggregating them, you have to add the annotation __@Timed__ to the controller
+
+Browse __BookController.java__ to see how it is implemented
+
 ----
-curl -s http://localhost:8082/q/metrics/application | more
+curl -s http://localhost:8082/actuator/metrics/bookController
 ----
 
 In contrast to OpenTracing, there is no default application metric. Methods have to be explicitelly annotated to generate metrics.
@@ -332,7 +338,7 @@ We can select a metric and do a graph with it. We can see different kinds of met
 * counters: how much?
 * timers: how long?
 
-Prometheus offers a basic GUI and it is recommended to use Graphana in production.
+Prometheus offers a basic GUI and it is recommended to use Grafana in production.
 
 Browse _BookResource.java_ to see how Metrics is coded.
 

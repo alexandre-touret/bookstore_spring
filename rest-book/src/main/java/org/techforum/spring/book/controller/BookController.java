@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Book REST API
  */
 @RestController()
-@Timed
+@Timed(value = "bookController")
 @RequestMapping(value = "/api/books", produces = APPLICATION_JSON_VALUE)
 public class BookController {
     private BookService bookService;

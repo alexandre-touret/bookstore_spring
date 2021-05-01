@@ -1,5 +1,12 @@
 server:
   port: 8081
+spring:
+  application:
+    name: rest-number
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
 
 
 resilience4j.bulkhead:
@@ -65,3 +72,12 @@ management:
         request:
           autotime:
             enabled: true
+
+
+# Default values
+opentracing:
+  jaeger:
+    udp-sender:
+      host: localhost
+      port: 6831
+    enabled: true

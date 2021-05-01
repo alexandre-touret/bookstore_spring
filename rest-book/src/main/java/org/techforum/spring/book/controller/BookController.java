@@ -1,5 +1,6 @@
 package org.techforum.spring.book.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
  * Book REST API
  */
 @RestController()
+@Timed
 @RequestMapping(value = "/api/books", produces = APPLICATION_JSON_VALUE)
 public class BookController {
     private BookService bookService;

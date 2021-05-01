@@ -42,8 +42,18 @@ management:
       probes:
         enabled: true
       show-details: always
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
   health:
     livenessstate:
       enabled: true
     readinessstate:
       enabled: true
+  metrics:
+    web:
+      client:
+        request:
+          autotime:
+            enabled: true

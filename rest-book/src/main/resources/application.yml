@@ -22,6 +22,9 @@ spring:
 
 
 management:
+  endpoints:
+    enabled-by-default: true
+
   endpoint:
     health:
       show-details: always
@@ -30,6 +33,10 @@ management:
         enabled: true
     shutdown:
       enabled: true
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
   health:
     livenessstate:
       enabled: true
@@ -37,6 +44,12 @@ management:
       enabled: true
     datasource:
       enabled: true
+  metrics:
+    web:
+      client:
+        request:
+          autotime:
+            enabled: true
 springdoc:
   api-docs:
     enabled: true
@@ -47,4 +60,3 @@ booknumbers:
   api:
     url: http://127.0.0.1:8081/api/books
     timeout_sec: 2
-

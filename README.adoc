@@ -268,11 +268,44 @@ Under the cover, context propagation is based on a specific HTTP header __uber-t
 
 Metrics is another aspect of observability.
 
-By default, Quarkus provides some base and vendor metrics.
+https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html#production-ready-process-monitoring[Actuator provides many features to enable it]
 
-Base metrics are about the JVM (classes, threads, gc):
+It must be configured in application.yml
+
 ----
-curl -s http://localhost:8082/q/metrics/base | more
+management:
+  auditevents:
+    enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      enabled: true
+      probes:
+        enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  metrics:
+    web:
+      client:
+        request:
+          autotime:
+            enabled: true
+----
+
+We can also gather rest endpoints metrics such as the time to respond.
+
+Base metrics are about the JVM (classes, threads, gc)
+----
+curl -s http://localhost:8082/actuator/metrics/ | more
 ----
 
 Vendor metrics provides complementary technical metrics (cpu load, memory):

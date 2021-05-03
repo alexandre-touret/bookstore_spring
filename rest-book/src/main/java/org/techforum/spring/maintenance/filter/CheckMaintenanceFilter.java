@@ -24,8 +24,8 @@ import static org.techforum.spring.maintenance.controller.MaintenanceController.
  * @see org.techforum.spring.GlobalExceptionHandler : defines which http return code to provide to the client
  */
 @Component
-public class MaintenanceFilter implements Filter {
-    private final static Logger LOGGER = LoggerFactory.getLogger(MaintenanceFilter.class);
+public class CheckMaintenanceFilter implements Filter {
+    private final static Logger LOGGER = LoggerFactory.getLogger(CheckMaintenanceFilter.class);
     @Autowired
     private ApplicationAvailability availability;
 

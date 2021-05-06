@@ -1,6 +1,7 @@
 package org.techforum.spring.number.controller;
 
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@Timed
 @RestController
 @RequestMapping(value = "/api/books", produces = APPLICATION_JSON_VALUE)
 public class BookNumbersController {

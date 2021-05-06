@@ -1,5 +1,12 @@
 server:
   port: 8081
+spring:
+  application:
+    name: rest-number
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
 
 
 resilience4j.bulkhead:
@@ -32,6 +39,14 @@ time.to.sleep: 1000
 
 
 management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
   auditevents:
     enabled: true
   endpoint:
@@ -42,8 +57,27 @@ management:
       probes:
         enabled: true
       show-details: always
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
   health:
     livenessstate:
       enabled: true
     readinessstate:
       enabled: true
+  metrics:
+    web:
+      client:
+        request:
+          autotime:
+            enabled: true
+
+
+# Default values
+opentracing:
+  jaeger:
+    udp-sender:
+      host: localhost
+      port: 6831
+    enabled: true

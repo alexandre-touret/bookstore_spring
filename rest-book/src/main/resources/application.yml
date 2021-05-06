@@ -13,15 +13,22 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
     hibernate:
       ddl-auto: create-drop
-
   cloud:
     circuitbreaker:
       resilience4j:
         enabled: true
-
-
+  application:
+    name: rest-book
 
 management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
   endpoint:
     health:
       show-details: always
@@ -30,6 +37,10 @@ management:
         enabled: true
     shutdown:
       enabled: true
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
   health:
     livenessstate:
       enabled: true
@@ -37,6 +48,12 @@ management:
       enabled: true
     datasource:
       enabled: true
+  metrics:
+    web:
+      client:
+        request:
+          autotime:
+            enabled: true
 springdoc:
   api-docs:
     enabled: true
@@ -48,3 +65,10 @@ booknumbers:
     url: http://127.0.0.1:8081/api/books
     timeout_sec: 2
 
+# Default values
+opentracing:
+  jaeger:
+    udp-sender:
+      host: localhost
+      port: 6831
+    enabled: true

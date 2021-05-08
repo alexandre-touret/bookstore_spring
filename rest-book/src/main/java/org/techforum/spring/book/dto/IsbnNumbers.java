@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
+/**
+ * Exposes only the useful attributes from the payload returned by Numbers API
+ */
 public class IsbnNumbers implements Serializable {
     @JsonProperty("isbn_10")
     private String isbn10;

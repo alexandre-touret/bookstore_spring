@@ -1,9 +1,9 @@
 package org.techforum.spring.maintenance.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
+/**
+ * Used for indicating the app is under maintenance
+ */
+//@ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
 public class MaintenanceException extends RuntimeException {
     public MaintenanceException() {
     }

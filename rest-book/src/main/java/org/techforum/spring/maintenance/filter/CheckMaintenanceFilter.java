@@ -34,14 +34,14 @@ public class CheckMaintenanceFilter implements Filter {
     private HandlerExceptionResolver exceptionHandler;
 
     /**
-     * Check if the application is on maintenance. If it is and if the requested URI is not '/api/maintenance', it throws a <code>MaintenanceException</code>
+     * Checks if the application is under maintenance. If it is and if the requested URI is not '/api/maintenance', it throws a <code>MaintenanceException</code>
      *
      * @param request
      * @param response
      * @param chain
      * @throws IOException
      * @throws ServletException
-     * @throws MaintenanceException the application is on maintenance
+     * @throws MaintenanceException the application is under maintenance
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

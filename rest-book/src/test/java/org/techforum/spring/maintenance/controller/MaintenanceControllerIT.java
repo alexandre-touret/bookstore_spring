@@ -8,6 +8,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.RequestEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.techforum.spring.book.entity.Book;
 import org.techforum.spring.maintenance.dto.MaintenanceDTO;
 
 import java.net.URI;
@@ -16,8 +17,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -56,6 +56,15 @@ class MaintenanceControllerIT {
         assertEquals(NO_CONTENT, responseEntity.getStatusCode());
         var response = restTemplate.getForEntity("http://127.0.0.1:" + port + "/api/maintenance", MaintenanceDTO.class).getBody();
         assertTrue(response.isInMaintenance());
-
     }
+
+    @Test
+    void should_throw_i_m_teapot_http_code() throws Exception {
+        var requestEntity = RequestEntity.put(new URI("http://127.0.0.1:" + port + "/api/maintenance")).body(TRUE.toString());
+        var responseEntity = restTemplate.exchange(requestEntity, Void.class);
+        assertEquals(NO_CONTENT, responseEntity.getStatusCode());
+        var response = restTemplate.getForEntity("http://127.0.0.1:" + port + "/api/book", Book.class);
+        assertEquals(I_AM_A_TEAPOT, response.getStatusCode());
+    }
+
 }

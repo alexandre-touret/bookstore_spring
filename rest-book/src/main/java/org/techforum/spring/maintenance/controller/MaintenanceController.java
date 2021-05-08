@@ -1,5 +1,7 @@
 package org.techforum.spring.maintenance.controller;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.boot.availability.ApplicationAvailability;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.ReadinessState;
@@ -37,12 +39,16 @@ public class MaintenanceController {
         this.availability = applicationAvailability;
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Checks if the application in under maitenance")})
     @GetMapping
     public ResponseEntity<MaintenanceDTO> retreiveInMaintenance() {
         var lastChangeEvent = availability.getLastChangeEvent(ReadinessState.class);
         return ResponseEntity.ok(new MaintenanceDTO(lastChangeEvent.getState().equals(ReadinessState.REFUSING_TRAFFIC), new Date(lastChangeEvent.getTimestamp())));
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Put the app under maitenance")})
     @PutMapping
     public ResponseEntity<Void> initInMaintenance(@NotNull @RequestBody String inMaintenance) {
         AvailabilityChangeEvent.publish(eventPublisher, this, Boolean.valueOf(inMaintenance) ? ReadinessState.REFUSING_TRAFFIC : ReadinessState.ACCEPTING_TRAFFIC);

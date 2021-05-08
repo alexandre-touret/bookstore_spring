@@ -19,7 +19,11 @@ import java.util.concurrent.TimeoutException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Timed
+/**
+ * Numbers API spring controller
+ * the time to respond is monitor using <code>@Timed</code> annotation
+ */
+@Timed(value = "numberController")
 @RestController
 @RequestMapping(value = "/api/books", produces = APPLICATION_JSON_VALUE)
 public class BookNumbersController {
@@ -32,6 +36,13 @@ public class BookNumbersController {
         this.bookNumbersService = bookNumbersService;
     }
 
+    /**
+     * Gets the ISBN numbers for a given book. If there is a timeout calling {@link #bookNumbersService}, the method {@link #generateBookNumbersFallBack(TimeoutException)} is called
+     * The timeout mechanism is specified in the <code>application.yml</code> . You can check the <code>book-numbers</code> timeout instance out.
+     *
+     * @return The ISBN numbers
+     * @see #generateBookNumbersFallBack(TimeoutException)
+     */
     @TimeLimiter(name = "book-numbers", fallbackMethod = "generateBookNumbersFallBack")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Gets book numbers")
@@ -46,6 +57,11 @@ public class BookNumbersController {
         return CompletableFuture.supplyAsync(() -> bookNumbersService.createBookNumbers());
     }
 
+    /**
+     * Fallback method
+     * @param e The handled exception
+     * @return failedFuture
+     */
     @ResponseStatus(HttpStatus.GATEWAY_TIMEOUT)
     @ExceptionHandler({TimeoutException.class})
     public CompletableFuture<BookNumbers> generateBookNumbersFallBack(TimeoutException e) {

@@ -60,7 +60,7 @@ public class BookService {
         List<Long> ids = bookRepository.findAllIds();
         final var size = ids.size();
         var aLong = ids.get(new Random().nextInt(size));
-        return findBookById(aLong).orElseThrow(() -> new IllegalStateException());
+        return findBookById(aLong).orElseThrow(IllegalStateException::new);
     }
 
 
@@ -83,9 +83,10 @@ public class BookService {
 
     /**
      * Fallback method used for serialising the payload into a JSON file
+     *
      * @param book the current book
      * @return the current book
-     * @throws IllegalStateException can't store the current file
+     * @throws IllegalStateException   can't store the current file
      * @throws ApiCallTimeoutException normal behaviour.
      */
     // We have no ISBN numbers, we cannot persist in the database
@@ -103,6 +104,7 @@ public class BookService {
 
     /**
      * Finds all books
+     *
      * @return all the books stored in the database
      */
     public List<Book> findAllBooks() {
@@ -128,8 +130,10 @@ public class BookService {
 
     private Book persistBook(Book book) {
         var isbnNumbers = restTemplate.getForEntity(isbnServiceURL, IsbnNumbers.class).getBody();
-        book.isbn13 = isbnNumbers.getIsbn13();
-        book.isbn10 = isbnNumbers.getIsbn10();
+        if (book != null) {
+            book.isbn13 = isbnNumbers.getIsbn13();
+            book.isbn10 = isbnNumbers.getIsbn10();
+        }
         return bookRepository.save(book);
     }
 

@@ -1,8 +1,6 @@
 package org.techforum.spring.number.service;
 
 import com.github.javafaker.Faker;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +9,6 @@ import org.techforum.spring.number.dto.BookNumbers;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Service

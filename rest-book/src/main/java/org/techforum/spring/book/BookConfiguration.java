@@ -13,6 +13,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
+/**
+ * Book Spring Configuration
+ */
 @Configuration
 public class BookConfiguration {
 
@@ -24,6 +27,11 @@ public class BookConfiguration {
         return restTemplateBuilder.build();
     }
 
+    /**
+     * Creates a circuit breaker customizer applying a timeout specified by the <code>booknumbers.api.timeout_sec</code> property.
+     *
+     * @return the default resilience4j circuit breaker customizer
+     */
     @Bean
     public Customizer<Resilience4JCircuitBreakerFactory> createDefaultCustomizer() {
         return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
@@ -32,6 +40,11 @@ public class BookConfiguration {
                 .build());
     }
 
+    /**
+     * Creates a circuit breaker customizer applying a timeout specified by the <code>booknumbers.api.timeout_sec</code> property.
+     * This customizer could be reached using this id: <code>slowNumbers</code>
+     * @return the circuit breaker customizer to apply when calling to numbers api
+     */
     @Bean
     public Customizer<Resilience4JCircuitBreakerFactory> createSlowNumbersAPICallCustomizer() {
         return factory -> factory.configure(builder -> builder.circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())

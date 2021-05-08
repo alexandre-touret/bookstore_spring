@@ -1,8 +1,6 @@
 package org.techforum.spring.number.service;
 
 import com.github.javafaker.Faker;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,13 +9,12 @@ import org.techforum.spring.number.dto.BookNumbers;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class BookNumbersService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(BookNumbersService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookNumbersService.class);
 
 
     @Value("${number.separator:false}")
@@ -28,13 +25,13 @@ public class BookNumbersService {
 
     @PostConstruct
     public void postConstruct() {
-        LOGGER.info("JJS => timeToSleep=" + timeToSleep);
+        LOGGER.info("JJS => timeToSleep= {}", timeToSleep);
     }
 
 
 
     public BookNumbers createBookNumbers() {
-        LOGGER.info("Generating book numbers, sleeping " + timeToSleep + " msec");
+        LOGGER.info("Generating book numbers, sleeping {} msec", timeToSleep);
 
         try {
             if (timeToSleep != 0)

@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
+import org.techforum.spring.book.BookConfiguration;
 import org.techforum.spring.book.dto.IsbnNumbers;
 import org.techforum.spring.book.entity.Book;
 import org.techforum.spring.book.exception.ApiCallTimeoutException;
@@ -28,10 +30,11 @@ import static java.util.stream.Collectors.toList;
  * Book Spring Service
  */
 @Service
+@Validated
 public class BookService {
 
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(BookService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookService.class);
     private BookRepository bookRepository;
     private RestTemplate restTemplate;
 
@@ -50,11 +53,16 @@ public class BookService {
 
     }
 
+    /**
+     * Gets all the different IDS stored in the database and pick at random one book among these.
+     *
+     * @return A random book
+     */
     public Book findRandomBook() {
-        List<Long> ids = bookRepository.findAllIds();
+        var ids = bookRepository.findAllIds();
         final var size = ids.size();
         var aLong = ids.get(new Random().nextInt(size));
-        return findBookById(aLong).orElseThrow(() -> new IllegalStateException());
+        return findBookById(aLong).orElseThrow(IllegalStateException::new);
     }
 
 
@@ -64,6 +72,7 @@ public class BookService {
      * @param book book to register
      * @return the book saved
      * @see #fallbackPersistBook(Book)
+     * @see BookConfiguration#createSlowNumbersAPICallCustomizer()
      */
     public Book registerBook(@Valid Book book) {
         circuitBreakerFactory.create("slowNumbers").run(
@@ -74,10 +83,18 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    /**
+     * Fallback method used for serialising the payload into a JSON file
+     *
+     * @param book the current book
+     * @return the current book
+     * @throws IllegalStateException   can't store the current file
+     * @throws ApiCallTimeoutException normal behaviour.
+     */
     // We have no ISBN numbers, we cannot persist in the database
     private Book fallbackPersistBook(Book book) {
-        try (PrintWriter out = new PrintWriter("book-" + Instant.now().toEpochMilli() + ".json")) {
-            ObjectMapper objectMapper = new ObjectMapper();
+        try (var out = new PrintWriter("book-" + Instant.now().toEpochMilli() + ".json")) {
+            var objectMapper = new ObjectMapper();
             var bookJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(book);
             out.println(bookJson);
         } catch (FileNotFoundException | JsonProcessingException e) {
@@ -87,6 +104,11 @@ public class BookService {
         throw new ApiCallTimeoutException("Numbers not accessible");
     }
 
+    /**
+     * Finds all books
+     *
+     * @return all the books stored in the database
+     */
     public List<Book> findAllBooks() {
         return StreamSupport.stream(bookRepository.findAll().spliterator(), false).collect(toList());
     }
@@ -110,8 +132,10 @@ public class BookService {
 
     private Book persistBook(Book book) {
         var isbnNumbers = restTemplate.getForEntity(isbnServiceURL, IsbnNumbers.class).getBody();
-        book.isbn13 = isbnNumbers.getIsbn13();
-        book.isbn10 = isbnNumbers.getIsbn10();
+        if (isbnNumbers != null) {
+            book.isbn13 = isbnNumbers.getIsbn13();
+            book.isbn10 = isbnNumbers.getIsbn10();
+        }
         return bookRepository.save(book);
     }
 

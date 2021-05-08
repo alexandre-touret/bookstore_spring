@@ -148,6 +148,7 @@ class BookControllerIT {
         var uri = responseEntity.getHeaders().getLocation();
         assertNotNull(uri);
         assertTrue(uri.getPath().matches(".*/api/books/[1-9]+$"));
+        mockServer.verify();
     }
 
     @Test

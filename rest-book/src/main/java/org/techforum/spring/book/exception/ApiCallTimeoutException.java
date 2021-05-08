@@ -1,5 +1,8 @@
 package org.techforum.spring.book.exception;
 
+/**
+ * Exposes a timeout exception
+ */
 public class ApiCallTimeoutException extends RuntimeException {
     public ApiCallTimeoutException() {
         super();

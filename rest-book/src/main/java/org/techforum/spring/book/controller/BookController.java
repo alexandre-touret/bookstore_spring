@@ -22,7 +22,9 @@ import java.util.Map;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
- * Book REST API
+ * Book REST API.
+ * the API time to respond is monitor using <code>@Timed</code> annotation
+ * @see Timed
  */
 @RestController()
 @Timed(value = "bookController")

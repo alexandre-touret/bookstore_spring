@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class BookNumbersService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(BookNumbersService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookNumbersService.class);
 
 
     @Value("${number.separator:false}")
@@ -25,13 +25,13 @@ public class BookNumbersService {
 
     @PostConstruct
     public void postConstruct() {
-        LOGGER.info("JJS => timeToSleep=" + timeToSleep);
+        LOGGER.info("JJS => timeToSleep= {}", timeToSleep);
     }
 
 
 
     public BookNumbers createBookNumbers() {
-        LOGGER.info("Generating book numbers, sleeping " + timeToSleep + " msec");
+        LOGGER.info("Generating book numbers, sleeping {} msec", timeToSleep);
 
         try {
             if (timeToSleep != 0)

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 import org.techforum.spring.book.BookConfiguration;
 import org.techforum.spring.book.dto.IsbnNumbers;
@@ -29,10 +30,11 @@ import static java.util.stream.Collectors.toList;
  * Book Spring Service
  */
 @Service
+@Validated
 public class BookService {
 
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(BookService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookService.class);
     private BookRepository bookRepository;
     private RestTemplate restTemplate;
 
@@ -57,7 +59,7 @@ public class BookService {
      * @return A random book
      */
     public Book findRandomBook() {
-        List<Long> ids = bookRepository.findAllIds();
+        var ids = bookRepository.findAllIds();
         final var size = ids.size();
         var aLong = ids.get(new Random().nextInt(size));
         return findBookById(aLong).orElseThrow(IllegalStateException::new);
@@ -91,8 +93,8 @@ public class BookService {
      */
     // We have no ISBN numbers, we cannot persist in the database
     private Book fallbackPersistBook(Book book) {
-        try (PrintWriter out = new PrintWriter("book-" + Instant.now().toEpochMilli() + ".json")) {
-            ObjectMapper objectMapper = new ObjectMapper();
+        try (var out = new PrintWriter("book-" + Instant.now().toEpochMilli() + ".json")) {
+            var objectMapper = new ObjectMapper();
             var bookJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(book);
             out.println(bookJson);
         } catch (FileNotFoundException | JsonProcessingException e) {
@@ -130,7 +132,7 @@ public class BookService {
 
     private Book persistBook(Book book) {
         var isbnNumbers = restTemplate.getForEntity(isbnServiceURL, IsbnNumbers.class).getBody();
-        if (book != null) {
+        if (isbnNumbers != null) {
             book.isbn13 = isbnNumbers.getIsbn13();
             book.isbn10 = isbnNumbers.getIsbn10();
         }

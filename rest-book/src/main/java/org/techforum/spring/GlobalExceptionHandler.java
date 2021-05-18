@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
     @ExceptionHandler(MaintenanceException.class)
-    public void maintenance() {
-        /* nothing to do */
+    public APIError maintenance() {
+        return new APIError(HttpStatus.I_AM_A_TEAPOT.value(),"Service currently in maintenance");
     }
 
     /**
@@ -27,7 +27,8 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
     @ExceptionHandler({ApiCallTimeoutException.class})
-    public void timeoutException() {
+    public APIError timeoutException() {
+        return new APIError(HttpStatus.REQUEST_TIMEOUT.value(),"A timeout occured");
     }
 
 
@@ -36,6 +37,7 @@ public class GlobalExceptionHandler {
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({RuntimeException.class, Exception.class})
-    public void anyException() {
+    public APIError anyException() {
+        return new APIError(HttpStatus.INTERNAL_SERVER_ERROR.value(),"An unexpected server error occured");
     }
 }

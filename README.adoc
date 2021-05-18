@@ -194,7 +194,7 @@ http://localhost:9080/swagger-ui.html
 
 Have a quick test with GET API Books (list all books).
 
-## Demo 4: Calling Numbers with RestClient
+## Demo 4: Calling Numbers with RestTemplate
 
 Numbers is called by Books on book creation (createBook.sh):
 ----

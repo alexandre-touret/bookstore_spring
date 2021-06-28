@@ -1,4 +1,4 @@
-package info.bookstore.spring.number;
+package info.touret.bookstore.spring.number;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

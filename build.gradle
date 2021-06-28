@@ -1,9 +1,10 @@
 plugins {
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-    id 'org.sonarqube' version '3.2.0'
     id 'java'
     id 'idea'
+    id "org.sonarqube" version "3.2.0"
+    id "jacoco"
 }
 
 bootJar {
@@ -25,6 +26,18 @@ allprojects {
         useJUnitPlatform()
     }
 
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    sonarqube{
+        properties{
+            property "sonar.jacoco.reportPath", "$buildDir/jacoco/test.exec"
+            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+        }
+    }
 }
 
 subprojects {

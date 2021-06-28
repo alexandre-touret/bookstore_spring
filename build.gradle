@@ -1,9 +1,10 @@
 plugins {
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-    id 'org.sonarqube' version '3.2.0'
     id 'java'
     id 'idea'
+    id "org.sonarqube" version "3.2.0"
+    id "jacoco"
 }
 
 bootJar {
@@ -13,7 +14,7 @@ bootJar {
 allprojects {
     apply plugin: 'java'
 
-    group = 'com.worldline.techforum.bookstore'
+    group = 'info.touret.bookstore'
     version = '0.0.1-SNAPSHOT'
 
 
@@ -63,6 +64,19 @@ subprojects {
         enabled = true
     }
 
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    sonarqube{
+        properties{
+            property "sonar.jacoco.reportPath", "$buildDir/jacoco/test.exec"
+            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+        }
+    }
+
 }
 project(':rest-book') {
     dependencies {
@@ -75,6 +89,6 @@ project(':rest-book') {
 project(':rest-number') {
     dependencies {
         implementation 'com.github.javafaker:javafaker:1.0.2'
-        implementation 'org.yaml:snakeyaml:1.28'
+        implementation 'org.yaml:snakeyaml:1.29'
     }
 }

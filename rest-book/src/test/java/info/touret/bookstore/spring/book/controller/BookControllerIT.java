@@ -90,6 +90,7 @@ class BookControllerIT {
                     try {
                         Thread.sleep(30000);
                     } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                     return new MockClientHttpResponse(isbnNumbers.toString().getBytes(), HttpStatus.OK);
                 });

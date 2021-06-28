@@ -38,6 +38,7 @@ public class BookNumbersService {
                 TimeUnit.MILLISECONDS.sleep(timeToSleep);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
 
         Faker faker = new Faker();

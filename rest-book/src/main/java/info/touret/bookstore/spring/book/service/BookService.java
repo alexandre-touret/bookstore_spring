@@ -18,6 +18,7 @@ import info.touret.bookstore.spring.book.repository.BookRepository;
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +62,7 @@ public class BookService {
     public Book findRandomBook() {
         var ids = bookRepository.findAllIds();
         final var size = ids.size();
-        var aLong = ids.get(new Random().nextInt(size));
+        var aLong = ids.get(new SecureRandom().nextInt(size));
         return findBookById(aLong).orElseThrow(IllegalStateException::new);
     }
 

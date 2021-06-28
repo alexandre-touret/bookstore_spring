@@ -1,4 +1,4 @@
-## TechForum-2021 Demo
+## Bookstore in a microservices way
 
 This projects illustrates how to use Spring boot on a simple use case.
 

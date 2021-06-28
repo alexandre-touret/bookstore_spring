@@ -26,19 +26,6 @@ allprojects {
         useJUnitPlatform()
     }
 
-    jacocoTestReport {
-        reports {
-            xml.enabled true
-        }
-    }
-
-    sonarqube{
-        properties{
-            property "sonar.jacoco.reportPath", "$buildDir/jacoco/test.exec"
-            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-            property "sonar.branch", "master"
-        }
-    }
 }
 
 subprojects {
@@ -75,6 +62,20 @@ subprojects {
 
     bootJar {
         enabled = true
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    sonarqube{
+        properties{
+            property "sonar.jacoco.reportPath", "$buildDir/jacoco/test.exec"
+            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+            property "sonar.branch", "master"
+        }
     }
 
 }

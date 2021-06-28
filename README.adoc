@@ -113,7 +113,7 @@ We can check now that Books is no longer ready (`checkMaintenance.sh`):
 curl -s http://localhost:8082/q/health/ready | jq
 ----
 
-Let's inspect the code of link:rest-book/src/main/java/org/techforum/spring/maintenance/controller/MaintenanceController.java[`MaintenanceController.retreiveInMaintenance()`] to see how the HealthCheck probe is developped.
+Let's inspect the code of link:rest-book/src/main/java/oinfo/touret/bookstore/spring/maintenance/controller/MaintenanceController.java[`MaintenanceController.retreiveInMaintenance()`] to see how the HealthCheck probe is developped.
 
 Let's try to read a random book (`randomBook.sh`):
 [source,curl]
@@ -130,7 +130,7 @@ We get an answer from Books:
 }
 ----
 
-Let's browse the code of link:rest-book/src/main/java/org/techforum/spring/maintenance/filter/CheckMaintenanceFilter.java[`CheckMaintenanceFilter.java`] and see how this answer is provided using a JAX-RS filter.
+Let's browse the code of link:rest-book/src/main/java/oinfo/touret/bookstore/spring/maintenance/filter/CheckMaintenanceFilter.java[`CheckMaintenanceFilter.java`] and see how this answer is provided using a JAX-RS filter.
 
 Let's reopen the service (`unsetMaintenance.sh`):
 [source,]
@@ -156,9 +156,9 @@ curl -s -w "\n" 'localhost:8082/api/books/random' | jq
 ----
 Browse the following source to see how its is implemented:
 
-* _link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[`BookController.java`]_: Spring MVC, SpringDoc, Swagger, Actuator
-* _link:rest-book/src/main/java/org/techforum/spring/book/service/BookService.java[`BookService.java`]_: Spring, Spring Data, OpenTracing
-* _link:rest-book/src/main/java/org/techforum/spring/book/repository/BookRepository.java[`BookRepository.java`]_: Spring Data
+* _link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/controller/BookController.java[`BookController.java`]_: Spring MVC, SpringDoc, Swagger, Actuator
+* _link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/service/BookService.java[`BookService.java`]_: Spring, Spring Data, OpenTracing
+* _link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/repository/BookRepository.java[`BookRepository.java`]_: Spring Data
 
 ## Demo 3: Focus on OpenAPI and Swagger UI
 
@@ -169,8 +169,8 @@ curl -s -w "\n" localhost:8082/v3/api-docs | jq
 ----
 Browse the following files to see how OpenAPI is coded:
 
-* `link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]`
-* `link:rest-book/src/main/java/org/techforum/spring/GlobalExceptionHandler.java[GlobalExceptionHandler.java]̀
+* `link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/controller/BookController.java[BookController.java]`
+* `link:rest-book/src/main/java/oinfo/touret/bookstore/spring/GlobalExceptionHandler.java[GlobalExceptionHandler.java]̀
 
 OpenAPI/Swagger is enabled by default.
 You can disable it by applying this property
@@ -211,11 +211,11 @@ curl -s -w "\n" localhost:8082/api/books/1 | jq
 How does it work behind the scene?
 We make use of Spring RestTemplate
 
-Browse link:rest-book/src/main/java/org/techforum/spring/book/service/BookService.java[`BookService.java`] , link:rest-book/src/main/java/org/techforum/spring/book/BookConfiguration.java[`BookConfiguration.java`] and `link:rest-book/src/main/resources/application.yml[application.yml]` to see how it is coded:
+Browse link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/service/BookService.java[`BookService.java`] , link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/BookConfiguration.java[`BookConfiguration.java`] and `link:rest-book/src/main/resources/application.yml[application.yml]` to see how it is coded:
 
 * `link:rest-book/src/main/resources/application.yml[application.yml]`: a bit of configuration to define the target URL
-* link:rest-book/src/main/java/org/techforum/spring/book/service/BookService.java[`BookService.java`] : the rest template is injected in the constructor
-* link:rest-book/src/main/java/org/techforum/spring/book/BookConfiguration.java[`BookConfiguration.java`]: creates the restTemplate instance
+* link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/service/BookService.java[`BookService.java`] : the rest template is injected in the constructor
+* link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/BookConfiguration.java[`BookConfiguration.java`]: creates the restTemplate instance
 
 
 ## Demo 5: Fault Tolerance
@@ -230,9 +230,9 @@ ls -l rest-book/book-*
 
 Browse `BookService.java`, `BookConfiguration` and `BookController.java` to see how FaultTolerance is coded:
 
-* `CircuitBreakerFactory` usage on `link:rest-book/src/main/java/org/techforum/spring/book/service/BookService.java[BookService.registerBook()]`
-* `Resilience4JCircuitBreakerFactory` (global and specific) configuration on link:rest-book/src/main/java/org/techforum/spring/book/BookConfiguration.java[`BookConfiguration`]
-* Catch `ApiCallTimeoutException` on link:/home/littlewing/dev/src/techforum_spring/rest-book/src/main/java/org/techforum/spring/GlobalExceptionHandler.java[`GlobalExceptionHandler`]
+* `CircuitBreakerFactory` usage on `link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/service/BookService.java[BookService.registerBook()]`
+* `Resilience4JCircuitBreakerFactory` (global and specific) configuration on link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/BookConfiguration.java[`BookConfiguration`]
+* Catch `ApiCallTimeoutException` on link:/home/littlewing/dev/src/techforum_spring/rest-book/src/main/java/oinfo/touret/bookstore/spring/GlobalExceptionHandler.java[`GlobalExceptionHandler`]
 
 Other features from FaulTolerance (not in the demo): Timeout, CircuitBreaker, Retry, BulkHead, Asynchronous. 
 
@@ -322,7 +322,7 @@ curl -s http://localhost:8082/actuator/metrics/jvm.memory.used
 It is also possible to add custom application metrics, such as a rest controller metrics.
 To start aggregating them, you have to add the annotation link:https://metrics.dropwizard.io/3.1.0/[`@Timed`] to the controller
 
-Browse `link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]` to see how it is implemented
+Browse `link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/controller/BookController.java[BookController.java]` to see how it is implemented
 
 ----
 curl -s http://localhost:8082/actuator/metrics/bookController
@@ -344,10 +344,10 @@ We can select a metric and do a graph with it. We can see different kinds of met
 
 Prometheus offers a basic GUI and it is recommended to use Grafana in production.
 
-Browse `link:rest-book/src/main/java/org/techforum/spring/book/controller/BookController.java[BookController.java]` to see how Metrics is coded.
+Browse `link:rest-book/src/main/java/oinfo/touret/bookstore/spring/book/controller/BookController.java[BookController.java]` to see how Metrics is coded.
 
 ## Demo 9: Testing
 
-Browse link:rest-book/src/test/java/org/techforum/spring/book/controller/BookControllerIT.java[`BookControllerIT.java`] to see how to test using H2 in memory database and link:https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/client/MockRestServiceServer.html[`MockRestServiceServer`]
+Browse link:rest-book/src/test/java/oinfo/touret/bookstore/spring/book/controller/BookControllerIT.java[`BookControllerIT.java`] to see how to test using H2 in memory database and link:https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/client/MockRestServiceServer.html[`MockRestServiceServer`]
 
 

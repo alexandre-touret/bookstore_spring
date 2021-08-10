@@ -13,7 +13,6 @@ bootJar {
 
 allprojects {
     apply plugin: 'java'
-
     group = 'info.touret.bookstore'
     version = '0.0.1-SNAPSHOT'
 
@@ -90,5 +89,10 @@ project(':rest-number') {
     dependencies {
         implementation 'com.github.javafaker:javafaker:1.0.2'
         implementation 'org.yaml:snakeyaml:1.29'
+    }
+}
+project(':rest-store') {
+    dependencies {
+        implementation 'org.axonframework:axon-spring-boot-starter:4.2.1'
     }
 }

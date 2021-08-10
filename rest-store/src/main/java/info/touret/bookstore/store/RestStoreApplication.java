@@ -1,14 +1,11 @@
-package info.touret.bookstore.spring;
+package info.touret.bookstore.store;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Main Spring boot class
- */
 @SpringBootApplication
-public class RestBookstoreApplication {
+public class RestStoreApplication {
     public static void main(String[] args) {
-        SpringApplication.run(RestBookstoreApplication.class, args);
+        SpringApplication.run(RestStoreApplication.class, args);
     }
 }

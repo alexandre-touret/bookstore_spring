@@ -93,7 +93,7 @@ project(':rest-number') {
 }
 project(':rest-store') {
     dependencies {
-        implementation 'com.eventstore:db-client-java:0.5'
+        implementation 'com.eventstore:db-client-java:1.0.0'
         implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
     }
 }

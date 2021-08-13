@@ -3,7 +3,6 @@ package info.touret.bookstore.store.dto;
 import info.touret.bookstore.store.model.EventType;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 
 public class BookStoreResult implements Serializable {

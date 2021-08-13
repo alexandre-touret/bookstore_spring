@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class BookDTO implements Serializable {
 
-    public  Long bookId;
+    public Long bookId;
 
     public BookDTO(Long bookId) {
         this.bookId = bookId;

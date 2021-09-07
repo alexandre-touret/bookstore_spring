@@ -1,6 +1,6 @@
 package info.touret.bookstore.store.service;
 
-import com.eventstore.dbclient.Client;
+import com.eventstore.dbclient.EventStoreDBClient;
 import info.touret.bookstore.store.model.EventType;
 import info.touret.bookstore.store.model.StoreEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class StoreServiceTest {
 
     @Autowired
-    private Client client;
+    private EventStoreDBClient client;
 
     private StoreService storeService;
 

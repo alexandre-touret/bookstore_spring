@@ -1,9 +1,10 @@
 package info.touret.bookstore.store.service;
 
-import com.eventstore.dbclient.Client;
 import com.eventstore.dbclient.EventData;
 import com.eventstore.dbclient.EventDataBuilder;
+import com.eventstore.dbclient.EventStoreDBClient;
 import com.eventstore.dbclient.ReadResult;
+import com.eventstore.dbclient.ReadStreamOptions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -23,9 +24,9 @@ public class StoreService {
     //esdb://127.0.0.1:2113?tls=false
     private static final Logger LOGGER = LoggerFactory.getLogger(StoreService.class);
 
-    private Client eventStoreClient;
+    private EventStoreDBClient eventStoreClient;
 
-    public StoreService(Client eventStoreClient) {
+    public StoreService(EventStoreDBClient eventStoreClient) {
         this.eventStoreClient = eventStoreClient;
     }
 
@@ -38,8 +39,8 @@ public class StoreService {
     public void store(StoreEvent storeEvent) throws JsonProcessingException {
         ObjectMapper objectMapper = createObjectMapper();
         EventData eventData = EventDataBuilder.json(storeEvent.getEventType().toString(), objectMapper.writeValueAsString(storeEvent)).build();
-        var writeResultCompletableFuture = eventStoreClient.streams().appendStream(storeEvent.getBookId()).addEvent(eventData).execute();
-        writeResultCompletableFuture.whenComplete((writeResult1, throwable) -> {
+        var writeResultCompletableFuture = eventStoreClient.appendToStream(storeEvent.getBookId(), eventData);
+        eventStoreClient.appendToStream(storeEvent.getBookId(), eventData).whenComplete((writeResult1, throwable) -> {
             if (throwable != null) {
                 LOGGER.error(throwable.getMessage(), throwable);
             } else {
@@ -50,8 +51,10 @@ public class StoreService {
 
 
     public List<StoreEvent> readForwards(String bookId) {
-        var readResultCompletableFuture = eventStoreClient.streams().readStream(bookId).forward().fromStart().readThrough();
-
+        ReadStreamOptions options = ReadStreamOptions.get()
+                .forwards()
+                .fromStart();
+        var readResultCompletableFuture = eventStoreClient.readStream(bookId, options).toCompletableFuture();
         try {
             ReadResult readResult = readResultCompletableFuture.get();
             return readResult.getEvents()

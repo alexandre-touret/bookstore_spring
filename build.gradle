@@ -35,7 +35,7 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.sonarqube'
 
-    sourceCompatibility = '11'
+    sourceCompatibility = '17'
 
     dependencyManagement {
         imports {
@@ -53,7 +53,7 @@ subprojects {
         implementation 'io.github.resilience4j:resilience4j-spring-boot2'
         implementation 'io.micrometer:micrometer-registry-prometheus'
         implementation 'org.springframework.boot:spring-boot-starter-aop'
-        implementation 'org.springdoc:springdoc-openapi-ui:1.5.8'
+        implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
         implementation 'com.fasterxml.jackson.core:jackson-annotations'
         implementation 'io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.3.1'
         developmentOnly 'org.springframework.boot:spring-boot-devtools'

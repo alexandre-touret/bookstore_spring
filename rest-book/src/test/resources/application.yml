@@ -9,7 +9,6 @@ spring:
       show_sql: true
       format_sql: true
       generate_statistics: true
-      ddl-auto: update
     circuitbreaker:
       resilience4j:
         enabled: true

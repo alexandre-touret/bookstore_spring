@@ -9,10 +9,13 @@ spring:
       show_sql: true
       format_sql: true
       generate_statistics: true
+  circuitbreaker:
+     resilience4j:
+       enabled: true
+  cloud:
     circuitbreaker:
       resilience4j:
         enabled: true
-
 springdoc:
   api-docs:
     enabled: false

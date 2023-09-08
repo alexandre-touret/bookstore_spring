@@ -32,8 +32,3 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      - name: SonarCloud Scan
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew test jacocoTestReport sonarqube --stacktrace --info --scan

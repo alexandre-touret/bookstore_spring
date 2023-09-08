@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        gradlePluginPortal()
+    }
+}
 rootProject.name = 'Bookstore_Spring'
 include 'rest-book'
 include 'rest-number'
+

@@ -15,14 +15,13 @@ import info.touret.bookstore.spring.book.dto.IsbnNumbers;
 import info.touret.bookstore.spring.book.exception.ApiCallTimeoutException;
 import info.touret.bookstore.spring.book.repository.BookRepository;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;

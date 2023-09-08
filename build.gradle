@@ -3,8 +3,6 @@ plugins {
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
     id 'java'
     id 'idea'
-    id "org.sonarqube" version "${sonarqubeVersion}"
-    id "jacoco"
 }
 
 bootJar {
@@ -20,6 +18,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven { url 'https://repo.spring.io/milestone' }
     }
 
     test {
@@ -33,7 +32,6 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'org.sonarqube'
 
     sourceCompatibility = '17'
 
@@ -50,10 +48,9 @@ subprojects {
         implementation 'org.springframework.boot:spring-boot-starter-validation'
         implementation 'org.springframework.boot:spring-boot-starter-actuator'
         implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
-        implementation 'io.github.resilience4j:resilience4j-spring-boot2'
         implementation 'io.micrometer:micrometer-registry-prometheus'
         implementation 'org.springframework.boot:spring-boot-starter-aop'
-        implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
         implementation 'com.fasterxml.jackson.core:jackson-annotations'
         implementation 'io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.3.1'
         developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -64,18 +61,6 @@ subprojects {
         enabled = true
     }
 
-    jacocoTestReport {
-        reports {
-            xml.enabled true
-        }
-    }
-
-    sonarqube{
-        properties{
-            property "sonar.jacoco.reportPath", "$buildDir/jacoco/test.exec"
-            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        }
-    }
 
 }
 project(':rest-book') {
@@ -88,7 +73,9 @@ project(':rest-book') {
 
 project(':rest-number') {
     dependencies {
-        implementation 'com.github.javafaker:javafaker:1.0.2'
-        implementation 'org.yaml:snakeyaml:1.29'
+        implementation ('com.github.javafaker:javafaker:1.0.2'){
+            exclude group:'org.yaml', module:'snakeyaml'
+        }
+        implementation 'org.yaml:snakeyaml:2.2'
     }
 }

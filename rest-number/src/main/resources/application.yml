@@ -8,7 +8,9 @@ spring:
       resilience4j:
         enabled: true
 
-
+  threads:
+    virtual:
+      enabled: true
 resilience4j.bulkhead:
   configs:
     default:

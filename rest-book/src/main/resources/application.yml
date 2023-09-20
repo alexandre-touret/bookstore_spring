@@ -5,12 +5,15 @@ spring:
   ## The most important feature... ever
   banner:
     location=classpath:/banner.txt
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/books_database
     username: book
     password: book
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
   cloud:

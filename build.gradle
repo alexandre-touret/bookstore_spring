@@ -1,5 +1,6 @@
 plugins {
     id 'org.springframework.boot' version "${springBootVersion}"
+    id 'org.graalvm.buildtools.native' version "${springGraalVMNativeVersion}"
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
     id 'java'
     id 'idea'
@@ -32,6 +33,7 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.graalvm.buildtools.native'
 
     sourceCompatibility = '21'
 
@@ -69,6 +71,9 @@ project(':rest-book') {
         runtimeOnly 'org.postgresql:postgresql'
         testImplementation 'com.h2database:h2'
     }
+    tasks.named("bootJar") {
+        mainClass = 'info.touret.bookstore.spring.RestBookstoreApplication'
+    }
 }
 
 project(':rest-number') {
@@ -78,4 +83,8 @@ project(':rest-number') {
         }
         implementation 'org.yaml:snakeyaml:2.2'
     }
+    tasks.named("bootJar") {
+        mainClass = 'info.touret.bookstore.spring.number.RestNumbersApplication'
+    }
+
 }

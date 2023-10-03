@@ -33,7 +33,11 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'org.graalvm.buildtools.native'
+
+    if (System.getProperties().containsKey("native")) {
+        println 'Applying NATIVE MODE build'
+        apply plugin: 'org.graalvm.buildtools.native'
+    }
 
     sourceCompatibility = '21'
 

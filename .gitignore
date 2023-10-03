@@ -35,3 +35,4 @@ out/
 .vscode/
 
 book-**.json
+nohup.out

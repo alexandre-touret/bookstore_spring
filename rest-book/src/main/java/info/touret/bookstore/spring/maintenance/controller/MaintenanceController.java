@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import info.touret.bookstore.spring.maintenance.dto.MaintenanceDTO;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
